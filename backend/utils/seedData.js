@@ -24,6 +24,7 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 12000, currentBid: 15800,
     startDate: new Date('2026-01-01'), endDate: new Date('2026-12-31'),
     status: 'live', totalBids: 9, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'],
   },
   {
     title: 'Patek Philippe Calatrava 1960',
@@ -31,6 +32,7 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 45000, currentBid: 62000,
     startDate: new Date('2026-01-15'), endDate: new Date('2026-09-30'),
     status: 'live', totalBids: 14, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1548171915-e79a380a2a4b?w=600&q=80'],
   },
   {
     title: 'Omega Speedmaster Apollo 11',
@@ -38,6 +40,7 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 8000, currentBid: 9200,
     startDate: new Date('2026-03-01'), endDate: new Date('2026-06-30'),
     status: 'live', totalBids: 6, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=600&q=80'],
   },
   {
     title: 'Audemars Piguet Royal Oak 1972',
@@ -45,6 +48,7 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 30000, currentBid: 30000,
     startDate: new Date('2026-05-01'), endDate: new Date('2026-11-30'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=600&q=80'],
   },
 
   // ── Art ──
@@ -54,6 +58,7 @@ const auctionTemplates = (adminId) => [
     category: 'Art', startingBid: 3500, currentBid: 5100,
     startDate: new Date('2026-01-10'), endDate: new Date('2026-07-31'),
     status: 'live', totalBids: 7, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80'],
   },
   {
     title: 'Bronze Sculpture — "The Negotiator"',
@@ -61,6 +66,7 @@ const auctionTemplates = (adminId) => [
     category: 'Art', startingBid: 6000, currentBid: 7400,
     startDate: new Date('2026-02-01'), endDate: new Date('2026-08-31'),
     status: 'live', totalBids: 5, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80'],
   },
   {
     title: 'Watercolour Series — "Serengeti Seasons"',
@@ -68,6 +74,7 @@ const auctionTemplates = (adminId) => [
     category: 'Art', startingBid: 2000, currentBid: 2000,
     startDate: new Date('2026-06-01'), endDate: new Date('2026-12-31'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80'],
   },
   {
     title: 'Digital Print — "Afrofuturism #7"',
@@ -75,6 +82,7 @@ const auctionTemplates = (adminId) => [
     category: 'Art', startingBid: 1800, currentBid: 2600,
     startDate: new Date('2025-06-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 8, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80'],
   },
 
   // ── Electronics ──
@@ -84,6 +92,7 @@ const auctionTemplates = (adminId) => [
     category: 'Electronics', startingBid: 7000, currentBid: 8500,
     startDate: new Date('2026-02-15'), endDate: new Date('2026-05-31'),
     status: 'live', totalBids: 11, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80'],
   },
   {
     title: 'Sony A7R V Mirrorless Camera Kit',
@@ -91,6 +100,7 @@ const auctionTemplates = (adminId) => [
     category: 'Electronics', startingBid: 4500, currentBid: 5300,
     startDate: new Date('2026-01-20'), endDate: new Date('2026-06-30'),
     status: 'live', totalBids: 8, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80'],
   },
   {
     title: 'Vintage IBM ThinkPad 701C "Butterfly"',
@@ -98,6 +108,7 @@ const auctionTemplates = (adminId) => [
     category: 'Electronics', startingBid: 1200, currentBid: 1900,
     startDate: new Date('2026-03-01'), endDate: new Date('2026-09-30'),
     status: 'live', totalBids: 13, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80'],
   },
   {
     title: 'DJI Inspire 3 Drone — Full Kit',
@@ -105,6 +116,7 @@ const auctionTemplates = (adminId) => [
     category: 'Electronics', startingBid: 9000, currentBid: 9000,
     startDate: new Date('2026-05-15'), endDate: new Date('2026-11-15'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=600&q=80'],
   },
 
   // ── Jewelry ──
@@ -114,6 +126,7 @@ const auctionTemplates = (adminId) => [
     category: 'Jewelry', startingBid: 18000, currentBid: 23500,
     startDate: new Date('2026-01-05'), endDate: new Date('2026-07-05'),
     status: 'live', totalBids: 10, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80'],
   },
   {
     title: 'Emerald & Gold Necklace — Art Deco',
@@ -121,6 +134,7 @@ const auctionTemplates = (adminId) => [
     category: 'Jewelry', startingBid: 55000, currentBid: 71000,
     startDate: new Date('2026-02-01'), endDate: new Date('2026-10-31'),
     status: 'live', totalBids: 16, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80'],
   },
   {
     title: 'Pearl Strand — South Sea 18mm',
@@ -128,6 +142,7 @@ const auctionTemplates = (adminId) => [
     category: 'Jewelry', startingBid: 12000, currentBid: 14200,
     startDate: new Date('2025-09-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 7, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80'],
   },
 
   // ── Vehicles ──
@@ -137,13 +152,15 @@ const auctionTemplates = (adminId) => [
     category: 'Vehicles', startingBid: 65000, currentBid: 82000,
     startDate: new Date('2026-01-01'), endDate: new Date('2026-12-31'),
     status: 'live', totalBids: 12, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=600&q=80'],
   },
   {
     title: '1972 Lamborghini Miura SV',
-    description: 'One of only 150 Miura SVs produced. V12 engine recently rebuilt by Lamborghini Polo Storico. Rosso Corsa over tan leather. Documented history from new. Last sold at RM Sotheby\'s 2019 for $2.1M.',
+    description: 'One of only 150 Miura SVs produced. V12 engine recently rebuilt by Lamborghini Polo Storico. Rosso Corsa over tan leather. Documented history from new.',
     category: 'Vehicles', startingBid: 1800000, currentBid: 2100000,
     startDate: new Date('2026-03-01'), endDate: new Date('2026-09-01'),
     status: 'live', totalBids: 4, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=600&q=80'],
   },
   {
     title: '2021 Porsche 911 GT3 Touring',
@@ -151,6 +168,7 @@ const auctionTemplates = (adminId) => [
     category: 'Vehicles', startingBid: 185000, currentBid: 185000,
     startDate: new Date('2026-04-01'), endDate: new Date('2026-10-01'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80'],
   },
 
   // ── Other ──
@@ -160,6 +178,7 @@ const auctionTemplates = (adminId) => [
     category: 'Other', startingBid: 8000, currentBid: 11200,
     startDate: new Date('2026-01-15'), endDate: new Date('2026-08-15'),
     status: 'live', totalBids: 9, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80'],
   },
   {
     title: 'Stradivarius Violin — "The Nachez" 1707',
@@ -167,13 +186,15 @@ const auctionTemplates = (adminId) => [
     category: 'Other', startingBid: 900000, currentBid: 1250000,
     startDate: new Date('2026-02-01'), endDate: new Date('2026-11-30'),
     status: 'live', totalBids: 6, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80'],
   },
   {
     title: 'Signed Ali vs Foreman Fight Poster 1974',
-    description: 'Original promotional poster from the Rumble in the Jungle, Kinshasa 1974. Signed by both Muhammad Ali and George Foreman. JSA certified. Framed in UV-protective museum glass. One of 3 known signed examples.',
+    description: 'Original promotional poster from the Rumble in the Jungle, Kinshasa 1974. Signed by both Muhammad Ali and George Foreman. JSA certified. Framed in UV-protective museum glass.',
     category: 'Other', startingBid: 25000, currentBid: 38000,
     startDate: new Date('2025-07-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 15, createdBy: adminId,
+    images: ['https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80'],
   },
 ];
 
