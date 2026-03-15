@@ -30,6 +30,12 @@ export const registerUser = (data)  => api.post('/auth/register', data);
 export const loginUser    = (data)  => api.post('/auth/login', data);
 export const getProfile   = ()      => api.get('/auth/profile');
 
+// ─── Admin auction management ─────────────────────────
+export const getAllAuctionsAdmin  = (params) => api.get('/auctions/admin/all', { params });
+export const getPendingListings   = ()       => api.get('/auctions/admin/pending');
+export const approveListing       = (id)     => api.patch(`/auctions/${id}/approve`);
+export const rejectListing        = (id, reason) => api.patch(`/auctions/${id}/reject-listing`, { reason });
+
 // ─── Auctions ────────────────────────────────────────
 export const getAuctions       = (params) => api.get('/auctions', { params });
 export const getAuctionById    = (id)     => api.get(`/auctions/${id}`);
