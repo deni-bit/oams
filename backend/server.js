@@ -3,6 +3,8 @@ const dotenv    = require('dotenv');
 const cors      = require('cors');
 const helmet    = require('helmet');
 const rateLimit = require('express-rate-limit');
+const http      = require('http');
+const { Server } = require('socket.io');
 
 const connectDB     = require('./config/db');
 const authRoutes    = require('./routes/authRoutes');
@@ -39,7 +41,44 @@ console.log(`
 
 connectDB();
 
-const app = express();
+const app    = express();
+const server = http.createServer(app);
+
+// ─────────────────────────────────────────
+// SOCKET.IO — real-time bid updates
+// ─────────────────────────────────────────
+const io = new Server(server, {
+  cors: {
+    origin: [
+      'http://localhost:5173',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean),
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Attach io to app so controllers can access it
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log(`[WS] Client connected: ${socket.id}`);
+
+  // Buyer joins a specific auction room
+  socket.on('join_auction', (auctionId) => {
+    socket.join(auctionId);
+    console.log(`[WS] ${socket.id} joined auction room: ${auctionId}`);
+  });
+
+  // Buyer leaves auction room
+  socket.on('leave_auction', (auctionId) => {
+    socket.leave(auctionId);
+    console.log(`[WS] ${socket.id} left auction room: ${auctionId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`[WS] Client disconnected: ${socket.id}`);
+  });
+});
 
 // ─────────────────────────────────────────
 // 1. CORS
@@ -61,21 +100,18 @@ app.use(cors({
 }));
 
 // ─────────────────────────────────────────
-// 2. HELMET — secure HTTP headers
+// 2. HELMET
 // ─────────────────────────────────────────
 app.use(helmet());
 
 // ─────────────────────────────────────────
-// 3. BODY PARSER — limit payload size
+// 3. BODY PARSER
 // ─────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // ─────────────────────────────────────────
-// 4. MANUAL NOSQL INJECTION SANITIZER
-//    express-mongo-sanitize writes to
-//    req.query which Express 5 made read-only
-//    We sanitize req.body and req.params only
+// 4. MANUAL NOSQL SANITIZER
 // ─────────────────────────────────────────
 const sanitizeNoSQL = (obj) => {
   if (!obj || typeof obj !== 'object') return;
@@ -96,9 +132,6 @@ app.use((req, res, next) => {
 
 // ─────────────────────────────────────────
 // 5. MANUAL XSS SANITIZER
-//    xss-clean writes to req.query which
-//    Express 5 made read-only
-//    We sanitize req.body only — safe
 // ─────────────────────────────────────────
 const sanitizeXSS = (value) => {
   if (typeof value === 'string') {
@@ -125,10 +158,7 @@ app.use((req, res, next) => {
 });
 
 // ─────────────────────────────────────────
-// 6. MANUAL HPP PROTECTION
-//    hpp package writes to req.query which
-//    Express 5 made read-only
-//    We store clean query in req.cleanQuery
+// 6. MANUAL HPP
 // ─────────────────────────────────────────
 const HPP_WHITELIST = ['status', 'category'];
 
@@ -146,7 +176,7 @@ app.use((req, res, next) => {
 });
 
 // ─────────────────────────────────────────
-// 7. GLOBAL RATE LIMIT — 100 req / 15 min
+// 7. GLOBAL RATE LIMIT
 // ─────────────────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -158,7 +188,7 @@ const globalLimiter = rateLimit({
 app.use('/api', globalLimiter);
 
 // ─────────────────────────────────────────
-// 8. AUTH RATE LIMIT — 10 attempts / 15 min
+// 8. AUTH RATE LIMIT
 // ─────────────────────────────────────────
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -171,7 +201,7 @@ app.use('/api/auth/login',    authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 // ─────────────────────────────────────────
-// 9. BID RATE LIMIT — 20 bids / 5 min
+// 9. BID RATE LIMIT
 // ─────────────────────────────────────────
 const bidLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -188,7 +218,6 @@ app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids',     bidRoutes);
 app.use('/api/reports',  reportRoutes);
 
-// Health check
 app.get('/', (req, res) => res.json({
   message: 'OAMS API is running',
   version: '1.0.0',
@@ -197,12 +226,15 @@ app.get('/', (req, res) => res.json({
 }));
 
 // ─────────────────────────────────────────
-// ERROR HANDLERS — must be last
+// ERROR HANDLERS
 // ─────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 
+// ─────────────────────────────────────────
+// START SERVER — use server not app
+// ─────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT}`)
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT} with WebSocket support`)
 );

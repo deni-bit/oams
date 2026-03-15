@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getAuctionById, getBidsByAuction } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import BidModal from '../components/BidModal';
 import { toast } from 'react-toastify';
+import { io } from 'socket.io-client';
 
 const STATUS_COLORS = {
   live:      { bg: '#fff3e0', color: '#e65100' },
@@ -38,6 +39,9 @@ const AuctionDetail = () => {
   const [loading,   setLoading]     = useState(true);
   const [showModal, setShowModal]   = useState(false);
   const [imgError,  setImgError]    = useState(false);
+  const [liveUsers, setLiveUsers]   = useState(0);
+  const [newBidFlash, setNewBidFlash] = useState(false);
+  const socketRef                   = useRef(null);
 
   const fetchData = async () => {
     try {
@@ -57,6 +61,58 @@ const AuctionDetail = () => {
   useEffect(() => {
     fetchData();
     setImgError(false);
+
+    // ── Connect WebSocket ──
+    const socket = io('http://localhost:5000', {
+      transports: ['websocket'],
+    });
+    socketRef.current = socket;
+
+    // Join this auction room
+    socket.emit('join_auction', id);
+
+    // Real-time new bid
+    socket.on('bid_placed', (data) => {
+      if (data.auctionId !== id) return;
+
+      // Update auction state live
+      setAuction(prev => prev ? {
+        ...prev,
+        currentBid:    data.currentBid,
+        totalBids:     data.totalBids,
+        highestBidder: data.highestBidder,
+      } : prev);
+
+      // Prepend new bid to history
+      setBids(prev => [data.newBid, ...prev]);
+
+      // Flash animation on bid box
+      setNewBidFlash(true);
+      setTimeout(() => setNewBidFlash(false), 1000);
+
+      // Notify other watchers
+      if (user && data.newBid.bidder?.email !== user.email) {
+        toast.info(
+          `💰 New bid: $${data.currentBid.toLocaleString()} by ${data.highestBidder.name}`,
+          { autoClose: 4000 }
+        );
+      }
+    });
+
+    // Auction status changed by admin
+    socket.on('auction_status_changed', (data) => {
+      if (data.auctionId !== id) return;
+      setAuction(prev => prev ? { ...prev, status: data.status } : prev);
+      toast.info(`Auction status changed to: ${data.status.toUpperCase()}`);
+    });
+
+    // Live viewer count
+    socket.on('viewer_count', (count) => setLiveUsers(count));
+
+    return () => {
+      socket.emit('leave_auction', id);
+      socket.disconnect();
+    };
   }, [id]);
 
   if (loading) return (
@@ -74,14 +130,14 @@ const AuctionDetail = () => {
     </div>
   );
 
-  const canBid      = user && user.role === 'buyer' && auction.status === 'live';
-  const statusStyle = STATUS_COLORS[auction.status] || STATUS_COLORS.ended;
-  const image       = auction.images?.[0];
-  const showImage   = image && !imgError;
-  const timeLeft    = new Date(auction.endDate) - new Date();
-  const daysLeft    = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60 * 24)));
-  const topBid      = bids[0];
-  const fallbackBg  = CATEGORY_BG[auction.category] || '#f5f5f5';
+  const canBid        = user && user.role === 'buyer' && auction.status === 'live';
+  const statusStyle   = STATUS_COLORS[auction.status] || STATUS_COLORS.ended;
+  const image         = auction.images?.[0];
+  const showImage     = image && !imgError;
+  const timeLeft      = new Date(auction.endDate) - new Date();
+  const daysLeft      = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60 * 24)));
+  const topBid        = bids[0];
+  const fallbackBg    = CATEGORY_BG[auction.category] || '#f5f5f5';
   const fallbackEmoji = CATEGORY_EMOJI[auction.category] || '🏷️';
 
   return (
@@ -122,11 +178,11 @@ const AuctionDetail = () => {
             {auction.status === 'live' && (
               <div style={styles.livePill}>
                 <span style={styles.liveDot} />
-                LIVE
+                LIVE {liveUsers > 1 && `· ${liveUsers} watching`}
               </div>
             )}
 
-            {/* Days left top-left — only on live */}
+            {/* Days left top-left */}
             {auction.status === 'live' && (
               <div style={styles.daysLeftPill}>
                 ⏱ {daysLeft}d left
@@ -202,7 +258,11 @@ const AuctionDetail = () => {
         <div style={styles.right}>
 
           {/* ── Bid box ── */}
-          <div style={styles.bidBox}>
+          <div style={{
+            ...styles.bidBox,
+            outline: newBidFlash ? '2px solid #c9973a' : '2px solid transparent',
+            transition: 'outline 0.3s ease',
+          }}>
             <div style={styles.bidBoxHeader}>
               <p style={styles.currentBidLabel}>Current Bid</p>
               {auction.status === 'live' && (
@@ -218,7 +278,19 @@ const AuctionDetail = () => {
               )}
             </div>
 
-            <p style={styles.currentBidAmount}>
+            {/* Real-time indicator */}
+            {auction.status === 'live' && (
+              <div style={styles.realtimeBadge}>
+                <span style={styles.realtimeDot} />
+                Live updates on
+              </div>
+            )}
+
+            <p style={{
+              ...styles.currentBidAmount,
+              color: newBidFlash ? '#fff' : '#e2b96f',
+              transition: 'color 0.3s ease',
+            }}>
               ${auction.currentBid.toLocaleString()}
             </p>
 
@@ -242,7 +314,7 @@ const AuctionDetail = () => {
 
             <div style={styles.bidBoxDivider} />
 
-            {/* CTA buttons */}
+            {/* CTA */}
             {canBid && (
               <button onClick={() => setShowModal(true)} style={styles.bidBtn}>
                 🔨 Place a Bid
@@ -314,13 +386,13 @@ const AuctionDetail = () => {
               <div style={styles.bidList}>
                 {bids.map((bid, i) => (
                   <div
-                    key={bid._id}
+                    key={bid._id || i}
                     style={{
                       ...styles.bidItem,
                       ...(i === 0 ? styles.topBidItem : {}),
                     }}
                   >
-                    {/* Rank number */}
+                    {/* Rank */}
                     <div style={{
                       ...styles.bidRank,
                       background: i === 0 ? '#c9973a' : i === 1 ? '#aaa' : i === 2 ? '#cd7f32' : '#f0f0f0',
@@ -343,9 +415,7 @@ const AuctionDetail = () => {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={styles.bidderName}>
                         {bid.bidder?.name || 'Anonymous'}
-                        {i === 0 && (
-                          <span style={styles.leadingTag}> 🏆</span>
-                        )}
+                        {i === 0 && <span style={styles.leadingTag}> 🏆</span>}
                       </p>
                       <p style={styles.bidTime}>
                         {new Date(bid.createdAt).toLocaleString()}
@@ -430,7 +500,7 @@ const styles = {
     background: 'rgba(26,26,46,0.82)', color: '#e2b96f',
     padding: '5px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: '700',
   },
-  liveDot: { width: '7px', height: '7px', borderRadius: '50%', background: '#e74c3c' },
+  liveDot:      { width: '7px', height: '7px', borderRadius: '50%', background: '#e74c3c' },
   daysLeftPill: {
     position: 'absolute', top: '14px', left: '14px',
     background: 'rgba(231,76,60,0.85)', color: '#fff',
@@ -455,6 +525,15 @@ const styles = {
   countdownBadge:   { fontSize: '11px', background: 'rgba(231,76,60,0.2)', color: '#e74c3c', padding: '4px 10px', borderRadius: '12px', fontWeight: '600' },
   endedBadge:       { fontSize: '11px', background: 'rgba(255,255,255,0.08)', color: '#666', padding: '4px 10px', borderRadius: '12px', fontWeight: '600' },
   upcomingBadge:    { fontSize: '11px', background: 'rgba(21,101,192,0.2)', color: '#5b9bd5', padding: '4px 10px', borderRadius: '12px', fontWeight: '600' },
+  realtimeBadge: {
+    display: 'inline-flex', alignItems: 'center', gap: '5px',
+    fontSize: '10px', color: '#2ecc71', fontWeight: '600',
+    marginBottom: '8px', letterSpacing: '0.5px',
+  },
+  realtimeDot: {
+    width: '6px', height: '6px', borderRadius: '50%',
+    background: '#2ecc71', flexShrink: 0,
+  },
   currentBidAmount: { fontSize: '44px', fontWeight: '900', color: '#e2b96f', lineHeight: 1, marginBottom: '4px' },
   totalBids:        { fontSize: '13px', color: '#444', marginBottom: '16px' },
   leadingBidder:    { display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.06)', borderRadius: '10px', padding: '10px 14px', marginBottom: '16px' },
