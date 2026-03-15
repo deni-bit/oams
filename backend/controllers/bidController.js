@@ -81,10 +81,7 @@ const placeBid = asyncHandler(async (req, res) => {
 
   const populated = await bid.populate('bidder', 'name email');
 
-  // ─────────────────────────────────────────
-  // REAL-TIME BROADCAST via WebSocket
-  // Emit to everyone watching this auction room
-  // ─────────────────────────────────────────
+  // Real-time broadcast via WebSocket
   const io = req.app.get('io');
   if (io) {
     io.to(auctionId).emit('bid_placed', {
@@ -105,3 +102,76 @@ const placeBid = asyncHandler(async (req, res) => {
 
   res.status(201).json(populated);
 });
+
+// ─── Get bids by auction ──────────────────────────────
+// @route   GET /api/bids/auction/:auctionId
+// @access  Public
+const getBidsByAuction = asyncHandler(async (req, res) => {
+  const bids = await Bid.find({ auction: req.params.auctionId })
+    .populate('bidder', 'name email')
+    .sort({ amount: -1 });
+
+  res.json(bids);
+});
+
+// ─── Get my bids ──────────────────────────────────────
+// @route   GET /api/bids/my
+// @access  Private (Buyer)
+const getMyBids = asyncHandler(async (req, res) => {
+  const bids = await Bid.find({ bidder: req.user._id })
+    .populate('auction', 'title currentBid status endDate images category')
+    .sort({ createdAt: -1 });
+
+  res.json(bids);
+});
+
+// ─── Get all bids ─────────────────────────────────────
+// @route   GET /api/bids
+// @access  Admin
+const getAllBids = asyncHandler(async (req, res) => {
+  const bids = await Bid.find({})
+    .populate('bidder',  'name email')
+    .populate('auction', 'title currentBid status category')
+    .sort({ createdAt: -1 });
+
+  res.json(bids);
+});
+
+// ─── Reject a bid ─────────────────────────────────────
+// @route   PATCH /api/bids/:id/reject
+// @access  Admin
+const rejectBid = asyncHandler(async (req, res) => {
+  const bid = await Bid.findById(req.params.id);
+
+  if (!bid) {
+    res.status(404);
+    throw new Error('Bid not found');
+  }
+
+  if (bid.status === 'rejected') {
+    res.status(400);
+    throw new Error('This bid has already been rejected');
+  }
+
+  if (bid.status === 'won') {
+    res.status(400);
+    throw new Error('Cannot reject a winning bid');
+  }
+
+  bid.status = 'rejected';
+  await bid.save();
+
+  res.json({
+    success: true,
+    message: 'Bid rejected successfully',
+    bid,
+  });
+});
+
+module.exports = {
+  placeBid,
+  getBidsByAuction,
+  getMyBids,
+  getAllBids,
+  rejectBid,
+};
