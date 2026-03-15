@@ -6,6 +6,7 @@ import { AuthProvider }  from './context/AuthContext';
 import ProtectedRoute    from './components/ProtectedRoute';
 
 import Navbar            from './components/Navbar';
+import Footer            from './components/Footer';
 
 // ─── Public pages ─────────────────────────────────────
 import Home              from './pages/Home';
@@ -32,67 +33,74 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
-        <Routes>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Navbar />
 
-          {/* ── Public ── */}
-          <Route path="/"             element={<Home />} />
-          <Route path="/login"        element={<Login />} />
-          <Route path="/register"     element={<Register />} />
-          <Route path="/auctions/:id" element={<AuctionDetail />} />
+          <div style={{ flex: 1 }}>
+            <Routes>
 
-          {/* ── Buyer ── */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+              {/* ── Public ── */}
+              <Route path="/"             element={<Home />} />
+              <Route path="/login"        element={<Login />} />
+              <Route path="/register"     element={<Register />} />
+              <Route path="/auctions/:id" element={<AuctionDetail />} />
 
-          {/* ── Seller ── */}
-          <Route path="/seller" element={
-            <ProtectedRoute sellerOnly>
-              <SellerDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/seller/listings" element={
-            <ProtectedRoute sellerOnly>
-              <MyListings />
-            </ProtectedRoute>
-          } />
-          <Route path="/seller/listings/create" element={
-            <ProtectedRoute sellerOnly>
-              <CreateListing />
-            </ProtectedRoute>
-          } />
-          <Route path="/seller/listings/:id/bids" element={
-            <ProtectedRoute sellerOnly>
-              <ListingBids />
-            </ProtectedRoute>
-          } />
+              {/* ── Buyer ── */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
 
-          {/* ── Admin ── */}
-          <Route path="/admin" element={
-            <ProtectedRoute adminOnly>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/auctions" element={
-            <ProtectedRoute adminOnly>
-              <ManageAuctions />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/bids" element={
-            <ProtectedRoute adminOnly>
-              <ManageBids />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/reports" element={
-            <ProtectedRoute adminOnly>
-              <Reports />
-            </ProtectedRoute>
-          } />
+              {/* ── Seller ── */}
+              <Route path="/seller" element={
+                <ProtectedRoute sellerOnly>
+                  <SellerDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/listings" element={
+                <ProtectedRoute sellerOnly>
+                  <MyListings />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/listings/create" element={
+                <ProtectedRoute sellerOnly>
+                  <CreateListing />
+                </ProtectedRoute>
+              } />
+              <Route path="/seller/listings/:id/bids" element={
+                <ProtectedRoute sellerOnly>
+                  <ListingBids />
+                </ProtectedRoute>
+              } />
 
-        </Routes>
+              {/* ── Admin ── */}
+              <Route path="/admin" element={
+                <ProtectedRoute adminOnly>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/auctions" element={
+                <ProtectedRoute adminOnly>
+                  <ManageAuctions />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/bids" element={
+                <ProtectedRoute adminOnly>
+                  <ManageBids />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/reports" element={
+                <ProtectedRoute adminOnly>
+                  <Reports />
+                </ProtectedRoute>
+              } />
+
+            </Routes>
+          </div>
+
+          <Footer />
+        </div>
         <ToastContainer position="top-right" autoClose={3000} />
       </Router>
     </AuthProvider>
