@@ -11,6 +11,7 @@ const authRoutes    = require('./routes/authRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
 const bidRoutes     = require('./routes/bidRoutes');
 const reportRoutes  = require('./routes/reportRoutes');
+const sellerRoutes  = require('./routes/sellerRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -217,6 +218,7 @@ app.use('/api/auth',     authRoutes);
 app.use('/api/auctions', auctionRoutes);
 app.use('/api/bids',     bidRoutes);
 app.use('/api/reports',  reportRoutes);
+app.use('/api/seller', sellerRoutes);
 
 app.get('/', (req, res) => res.json({
   message: 'OAMS API is running',

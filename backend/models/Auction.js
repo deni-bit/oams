@@ -35,6 +35,22 @@ const auctionSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    // Track if listed by seller or admin
+    listedBy: {
+      type: String,
+      enum: ['admin', 'seller'],
+      default: 'admin',
+    },
+    // Approval flow for seller listings
+    approvalStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'approved', // admin listings auto-approved
+    },
+    rejectionReason: {
+      type: String,
+      default: '',
+    },
     startDate: {
       type: Date,
       required: [true, 'Start date is required'],
@@ -45,7 +61,7 @@ const auctionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['upcoming', 'live', 'ended', 'cancelled'],
+      enum: ['pending', 'upcoming', 'live', 'ended', 'cancelled'],
       default: 'upcoming',
     },
     totalBids: {

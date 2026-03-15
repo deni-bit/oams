@@ -22,12 +22,21 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['buyer', 'admin'],
+      enum: ['buyer', 'seller', 'admin'],
       default: 'buyer',
     },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    // Seller specific fields
+    sellerProfile: {
+      businessName:  { type: String, default: '' },
+      description:   { type: String, default: '' },
+      totalSales:    { type: Number, default: 0  },
+      totalRevenue:  { type: Number, default: 0  },
+      rating:        { type: Number, default: 0  },
+      isVerified:    { type: Boolean, default: false },
     },
   },
   { timestamps: true }
@@ -40,7 +49,7 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare entered password with hashed password
+// Compare password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

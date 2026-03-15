@@ -13,7 +13,6 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
 
-      // Reject malformed tokens
       if (!token || token.split('.').length !== 3) {
         res.status(401);
         throw new Error('Malformed token');
@@ -21,13 +20,11 @@ const protect = asyncHandler(async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Ensure token has required fields
       if (!decoded.id || !decoded.role) {
         res.status(401);
         throw new Error('Invalid token payload');
       }
 
-      // Always fetch fresh user — catches deactivated accounts
       const user = await User.findById(decoded.id).select('-password');
 
       if (!user) {
@@ -71,6 +68,26 @@ const adminOnly = (req, res, next) => {
   }
 };
 
+// ─── Seller only ─────────────────────────────────────
+const sellerOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'seller') {
+    next();
+  } else {
+    res.status(403);
+    throw new Error('Access denied: Sellers only');
+  }
+};
+
+// ─── Seller or Admin ─────────────────────────────────
+const sellerOrAdmin = (req, res, next) => {
+  if (req.user && (req.user.role === 'seller' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403);
+    throw new Error('Access denied: Sellers and Admins only');
+  }
+};
+
 // ─── Buyer only ──────────────────────────────────────
 const buyerOnly = (req, res, next) => {
   if (req.user && req.user.role === 'buyer') {
@@ -81,4 +98,4 @@ const buyerOnly = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly, buyerOnly };
+module.exports = { protect, adminOnly, sellerOnly, sellerOrAdmin, buyerOnly };

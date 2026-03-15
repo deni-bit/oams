@@ -14,6 +14,8 @@ const users = [
   { name: 'Sofia Reyes',    email: 'sofia@test.com',   password: '123456',      role: 'buyer'  },
   { name: 'Luca Bianchi',   email: 'luca@test.com',    password: '123456',      role: 'buyer'  },
   { name: 'Yuki Tanaka',    email: 'yuki@test.com',    password: '123456',      role: 'buyer'  },
+  { name: 'Marcus Auction', email: 'marcus@test.com',  password: '123456',      role: 'seller' },
+  { name: 'Zara Collectibles', email: 'zara@test.com', password: '123456',      role: 'seller' },
 ];
 
 const auctionTemplates = (adminId) => [
