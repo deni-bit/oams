@@ -7,18 +7,38 @@ const Bid      = require('../models/Bid');
 dotenv.config();
 
 const users = [
-  { name: 'Super Admin',    email: 'admin@oams.com',   password: 'Admin@1234',  role: 'admin'  },
-  { name: 'James Okonkwo',  email: 'james@test.com',   password: '123456',      role: 'buyer'  },
-  { name: 'Amina Hassan',   email: 'amina@test.com',   password: '123456',      role: 'buyer'  },
-  { name: 'Denis Mwangi',   email: 'denis@test.com',   password: '123456',      role: 'buyer'  },
-  { name: 'Sofia Reyes',    email: 'sofia@test.com',   password: '123456',      role: 'buyer'  },
-  { name: 'Luca Bianchi',   email: 'luca@test.com',    password: '123456',      role: 'buyer'  },
-  { name: 'Yuki Tanaka',    email: 'yuki@test.com',    password: '123456',      role: 'buyer'  },
-  { name: 'Marcus Auction', email: 'marcus@test.com',  password: '123456',      role: 'seller' },
-  { name: 'Zara Collectibles', email: 'zara@test.com', password: '123456',      role: 'seller' },
+  { name: 'Super Admin',       email: 'admin@oams.com',  password: 'Admin@1234', role: 'admin'  },
+  { name: 'James Okonkwo',     email: 'james@test.com',  password: '123456',     role: 'buyer'  },
+  { name: 'Amina Hassan',      email: 'amina@test.com',  password: '123456',     role: 'buyer'  },
+  { name: 'Denis Mwangi',      email: 'denis@test.com',  password: '123456',     role: 'buyer'  },
+  { name: 'Sofia Reyes',       email: 'sofia@test.com',  password: '123456',     role: 'buyer'  },
+  { name: 'Luca Bianchi',      email: 'luca@test.com',   password: '123456',     role: 'buyer'  },
+  { name: 'Yuki Tanaka',       email: 'yuki@test.com',   password: '123456',     role: 'buyer'  },
+  {
+    name: 'Marcus Auction',
+    email: 'marcus@test.com',
+    password: '123456',
+    role: 'seller',
+    sellerProfile: {
+      businessName: 'Marcus Premium Collectibles',
+      description:  'Specializing in rare watches and vintage automobiles',
+      isVerified:   true,
+    },
+  },
+  {
+    name: 'Zara Collectibles',
+    email: 'zara@test.com',
+    password: '123456',
+    role: 'seller',
+    sellerProfile: {
+      businessName: 'Zara Fine Arts & Jewelry',
+      description:  'Curated fine art, jewelry and luxury items',
+      isVerified:   true,
+    },
+  },
 ];
 
-const auctionTemplates = (adminId) => [
+const adminAuctionTemplates = (adminId) => [
   // ── Watches ──
   {
     title: 'Rolex Submariner 1968',
@@ -26,6 +46,7 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 12000, currentBid: 15800,
     startDate: new Date('2026-01-01'), endDate: new Date('2026-12-31'),
     status: 'live', totalBids: 9, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'],
   },
   {
@@ -34,169 +55,242 @@ const auctionTemplates = (adminId) => [
     category: 'Watches', startingBid: 45000, currentBid: 62000,
     startDate: new Date('2026-01-15'), endDate: new Date('2026-09-30'),
     status: 'live', totalBids: 14, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1548171915-e79a380a2a4b?w=600&q=80'],
   },
   {
     title: 'Omega Speedmaster Apollo 11',
-    description: 'Limited edition Omega Speedmaster commemorating the 50th anniversary of the Apollo 11 moon landing. Numbered edition 0847/1969. Unworn, full set with moonphase complication.',
+    description: 'Limited edition Omega Speedmaster commemorating the 50th anniversary of the Apollo 11 moon landing. Numbered edition 0847/1969.',
     category: 'Watches', startingBid: 8000, currentBid: 9200,
     startDate: new Date('2026-03-01'), endDate: new Date('2026-06-30'),
     status: 'live', totalBids: 6, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=600&q=80'],
   },
   {
     title: 'Audemars Piguet Royal Oak 1972',
-    description: 'First generation Royal Oak designed by Gerald Genta. Reference 5402 in stainless steel with the iconic integrated bracelet. Serviced 2024. Original documentation included.',
+    description: 'First generation Royal Oak designed by Gerald Genta. Reference 5402 in stainless steel with the iconic integrated bracelet. Serviced 2024.',
     category: 'Watches', startingBid: 30000, currentBid: 30000,
     startDate: new Date('2026-05-01'), endDate: new Date('2026-11-30'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=600&q=80'],
   },
 
   // ── Art ──
   {
     title: 'Abstract Oil — "Lagos at Dusk"',
-    description: 'Large-format abstract oil on canvas by emerging Nigerian artist Chidi Okafor. 120x180cm. Vivid sunset palette capturing the energy of Lagos harbour. Exhibited at Tafeta Gallery, London 2024.',
+    description: 'Large-format abstract oil on canvas by emerging Nigerian artist Chidi Okafor. 120x180cm. Vivid sunset palette capturing the energy of Lagos harbour.',
     category: 'Art', startingBid: 3500, currentBid: 5100,
     startDate: new Date('2026-01-10'), endDate: new Date('2026-07-31'),
     status: 'live', totalBids: 7, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80'],
   },
   {
     title: 'Bronze Sculpture — "The Negotiator"',
-    description: 'Limited edition bronze sculpture by Tanzanian sculptor Amara Diallo. Edition 3/12. Height 45cm on marble plinth. Depicts two figures in dialogue — a commentary on modern diplomacy.',
+    description: 'Limited edition bronze sculpture by Tanzanian sculptor Amara Diallo. Edition 3/12. Height 45cm on marble plinth.',
     category: 'Art', startingBid: 6000, currentBid: 7400,
     startDate: new Date('2026-02-01'), endDate: new Date('2026-08-31'),
     status: 'live', totalBids: 5, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80'],
   },
   {
-    title: 'Watercolour Series — "Serengeti Seasons"',
-    description: 'Set of four framed watercolours depicting the Serengeti across four seasons. Each 50x70cm, archival framing. Artist: Miriam Osei. Certificate of authenticity and provenance included.',
-    category: 'Art', startingBid: 2000, currentBid: 2000,
-    startDate: new Date('2026-06-01'), endDate: new Date('2026-12-31'),
-    status: 'upcoming', totalBids: 0, createdBy: adminId,
-    images: ['https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80'],
-  },
-  {
     title: 'Digital Print — "Afrofuturism #7"',
-    description: 'Archival pigment print on aluminium, edition 1/10. 90x90cm. Part of the celebrated Afrofuturism series by Dakar-based artist Ibrahima Fall. Acquired from Whatiftheworld Gallery, Cape Town.',
+    description: 'Archival pigment print on aluminium, edition 1/10. 90x90cm. Part of the celebrated Afrofuturism series by Dakar-based artist Ibrahima Fall.',
     category: 'Art', startingBid: 1800, currentBid: 2600,
     startDate: new Date('2025-06-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 8, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80'],
   },
 
   // ── Electronics ──
   {
     title: 'Apple Mac Pro 2023 — M2 Ultra',
-    description: 'Apple Mac Pro with M2 Ultra chip, 192GB unified memory, 8TB SSD. Configured with Afterburner card. Used for 6 months in a professional video production studio. AppleCare+ until 2027.',
+    description: 'Apple Mac Pro with M2 Ultra chip, 192GB unified memory, 8TB SSD. Used for 6 months in a professional video production studio. AppleCare+ until 2027.',
     category: 'Electronics', startingBid: 7000, currentBid: 8500,
     startDate: new Date('2026-02-15'), endDate: new Date('2026-05-31'),
     status: 'live', totalBids: 11, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80'],
   },
   {
     title: 'Sony A7R V Mirrorless Camera Kit',
-    description: 'Sony Alpha A7R V body with 61MP full-frame sensor. Bundle includes: FE 24-70mm f/2.8 GM II, FE 85mm f/1.4 GM, three batteries, dual charger, and Pelican hard case. Under 3000 actuations.',
+    description: 'Sony Alpha A7R V body with 61MP full-frame sensor. Bundle includes FE 24-70mm f/2.8 GM II, FE 85mm f/1.4 GM, three batteries and Pelican hard case.',
     category: 'Electronics', startingBid: 4500, currentBid: 5300,
     startDate: new Date('2026-01-20'), endDate: new Date('2026-06-30'),
     status: 'live', totalBids: 8, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80'],
   },
   {
-    title: 'Vintage IBM ThinkPad 701C "Butterfly"',
-    description: 'Iconic IBM ThinkPad 701C with the legendary butterfly keyboard mechanism. Fully functional, serviced 2023. A piece of computing history — voted most innovative product of the century by Time magazine.',
-    category: 'Electronics', startingBid: 1200, currentBid: 1900,
-    startDate: new Date('2026-03-01'), endDate: new Date('2026-09-30'),
-    status: 'live', totalBids: 13, createdBy: adminId,
-    images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80'],
-  },
-  {
     title: 'DJI Inspire 3 Drone — Full Kit',
-    description: 'Professional DJI Inspire 3 cinema drone. Includes: 3x batteries, dual remote system, Zenmuse X9-8K Air camera, ND filter set, carrying case, and spare propellers. 12 flight hours logged.',
+    description: 'Professional DJI Inspire 3 cinema drone. Includes 3x batteries, dual remote system, Zenmuse X9-8K Air camera, ND filter set and carrying case.',
     category: 'Electronics', startingBid: 9000, currentBid: 9000,
     startDate: new Date('2026-05-15'), endDate: new Date('2026-11-15'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=600&q=80'],
   },
 
   // ── Jewelry ──
   {
     title: 'Victorian Diamond Brooch — 3.2ct',
-    description: 'Exceptional Victorian-era diamond brooch in silver-topped gold setting. Central old-mine cut diamond of 3.2ct, surrounded by 28 rose-cut diamonds totalling 1.8ct. Accompanied by GIA certificate.',
+    description: 'Exceptional Victorian-era diamond brooch in silver-topped gold setting. Central old-mine cut diamond of 3.2ct with GIA certificate.',
     category: 'Jewelry', startingBid: 18000, currentBid: 23500,
     startDate: new Date('2026-01-05'), endDate: new Date('2026-07-05'),
     status: 'live', totalBids: 10, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80'],
   },
   {
-    title: 'Emerald & Gold Necklace — Art Deco',
-    description: 'Art Deco necklace in 18k yellow gold set with 7 Colombian emeralds totalling 9.4ct and 142 diamonds totalling 3.1ct. Signed by Cartier Paris, circa 1925. Museum-quality piece with full provenance.',
-    category: 'Jewelry', startingBid: 55000, currentBid: 71000,
-    startDate: new Date('2026-02-01'), endDate: new Date('2026-10-31'),
-    status: 'live', totalBids: 16, createdBy: adminId,
-    images: ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80'],
-  },
-  {
     title: 'Pearl Strand — South Sea 18mm',
-    description: 'Exceptional South Sea pearl necklace, 47 perfectly matched white pearls averaging 18mm. 18k white gold clasp set with 0.85ct brilliant-cut diamond. Accompanied by GIA report and original box.',
+    description: 'Exceptional South Sea pearl necklace, 47 perfectly matched white pearls averaging 18mm. 18k white gold clasp set with 0.85ct brilliant-cut diamond.',
     category: 'Jewelry', startingBid: 12000, currentBid: 14200,
     startDate: new Date('2025-09-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 7, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80'],
   },
 
   // ── Vehicles ──
   {
     title: '1965 Ford Mustang Fastback',
-    description: 'Numbers-matching 1965 Ford Mustang Fastback in Highland Green. 289ci V8, 4-speed manual, factory A/C delete. Fully restored to concours condition in 2022. 47,200 original miles. AACA certified.',
+    description: 'Numbers-matching 1965 Ford Mustang Fastback in Highland Green. 289ci V8, 4-speed manual. Fully restored to concours condition in 2022. AACA certified.',
     category: 'Vehicles', startingBid: 65000, currentBid: 82000,
     startDate: new Date('2026-01-01'), endDate: new Date('2026-12-31'),
     status: 'live', totalBids: 12, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=600&q=80'],
   },
   {
-    title: '1972 Lamborghini Miura SV',
-    description: 'One of only 150 Miura SVs produced. V12 engine recently rebuilt by Lamborghini Polo Storico. Rosso Corsa over tan leather. Documented history from new.',
-    category: 'Vehicles', startingBid: 1800000, currentBid: 2100000,
-    startDate: new Date('2026-03-01'), endDate: new Date('2026-09-01'),
-    status: 'live', totalBids: 4, createdBy: adminId,
-    images: ['https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=600&q=80'],
-  },
-  {
     title: '2021 Porsche 911 GT3 Touring',
-    description: 'Porsche 911 992 GT3 with Touring package in Shark Blue. 6-speed manual, no wing, full PPF and ceramic coating. 4,200 miles. Every factory option including front axle lift and chrono package.',
+    description: 'Porsche 911 992 GT3 with Touring package in Shark Blue. 6-speed manual, full PPF and ceramic coating. 4,200 miles.',
     category: 'Vehicles', startingBid: 185000, currentBid: 185000,
     startDate: new Date('2026-04-01'), endDate: new Date('2026-10-01'),
     status: 'upcoming', totalBids: 0, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80'],
   },
 
   // ── Other ──
   {
     title: 'First Edition — "Things Fall Apart" 1958',
-    description: 'First edition, first printing of Chinua Achebe\'s Things Fall Apart (Heinemann, 1958). Original cloth binding, dust jacket with minor edge wear. One of the rarest post-colonial literary artifacts in private hands.',
+    description: 'First edition, first printing of Chinua Achebe\'s Things Fall Apart (Heinemann, 1958). Original cloth binding, dust jacket with minor edge wear.',
     category: 'Other', startingBid: 8000, currentBid: 11200,
     startDate: new Date('2026-01-15'), endDate: new Date('2026-08-15'),
     status: 'live', totalBids: 9, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80'],
   },
   {
-    title: 'Stradivarius Violin — "The Nachez" 1707',
-    description: 'Authenticated Antonio Stradivari violin from 1707, known as "The Nachez". Recently restored by luthier workshops in Cremona. Accompanied by two contemporary bows and a custom flight case.',
-    category: 'Other', startingBid: 900000, currentBid: 1250000,
-    startDate: new Date('2026-02-01'), endDate: new Date('2026-11-30'),
-    status: 'live', totalBids: 6, createdBy: adminId,
-    images: ['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80'],
-  },
-  {
     title: 'Signed Ali vs Foreman Fight Poster 1974',
-    description: 'Original promotional poster from the Rumble in the Jungle, Kinshasa 1974. Signed by both Muhammad Ali and George Foreman. JSA certified. Framed in UV-protective museum glass.',
+    description: 'Original promotional poster from the Rumble in the Jungle, Kinshasa 1974. Signed by both Muhammad Ali and George Foreman. JSA certified.',
     category: 'Other', startingBid: 25000, currentBid: 38000,
     startDate: new Date('2025-07-01'), endDate: new Date('2025-12-31'),
     status: 'ended', totalBids: 15, createdBy: adminId,
+    listedBy: 'admin', approvalStatus: 'approved',
     images: ['https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80'],
+  },
+];
+
+// ── Marcus seller listings ──────────────────────────
+const marcusListings = (marcusId) => [
+  {
+    title: 'Lamborghini Miura SV 1972',
+    description: 'One of only 150 Miura SVs produced. V12 engine recently rebuilt by Lamborghini Polo Storico. Rosso Corsa over tan leather. Documented history from new.',
+    category: 'Vehicles', startingBid: 1800000, currentBid: 2100000,
+    startDate: new Date('2026-03-01'), endDate: new Date('2026-09-01'),
+    status: 'live', totalBids: 4, createdBy: marcusId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=600&q=80'],
+  },
+  {
+    title: 'Vintage IBM ThinkPad 701C "Butterfly"',
+    description: 'Iconic IBM ThinkPad 701C with the legendary butterfly keyboard mechanism. Fully functional, serviced 2023. A piece of computing history.',
+    category: 'Electronics', startingBid: 1200, currentBid: 1900,
+    startDate: new Date('2026-03-01'), endDate: new Date('2026-09-30'),
+    status: 'live', totalBids: 13, createdBy: marcusId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80'],
+  },
+  {
+    title: 'Stradivarius Violin — "The Nachez" 1707',
+    description: 'Authenticated Antonio Stradivari violin from 1707. Recently restored by luthier workshops in Cremona. Accompanied by two contemporary bows and a custom flight case.',
+    category: 'Other', startingBid: 900000, currentBid: 1250000,
+    startDate: new Date('2026-02-01'), endDate: new Date('2026-11-30'),
+    status: 'live', totalBids: 6, createdBy: marcusId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&q=80'],
+  },
+  {
+    title: 'Rolex Daytona 1969 — Paul Newman Dial',
+    description: 'Extremely rare Rolex Daytona ref. 6239 with the iconic Paul Newman exotic dial. Tritium plots intact, original crown and pushers. Accompanied by vintage Rolex papers.',
+    category: 'Watches', startingBid: 200000, currentBid: 285000,
+    startDate: new Date('2025-08-01'), endDate: new Date('2025-12-31'),
+    status: 'ended', totalBids: 11, createdBy: marcusId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80'],
+  },
+  {
+    title: 'Ferrari 250 GTE 1963',
+    description: 'Matching numbers Ferrari 250 GTE 2+2 Series III. Rosso Corsa with black leather interior. One of 954 produced. Recently serviced by Ferrari Classiche.',
+    category: 'Vehicles', startingBid: 320000, currentBid: 320000,
+    startDate: new Date('2026-06-01'), endDate: new Date('2026-12-01'),
+    status: 'upcoming', totalBids: 0, createdBy: marcusId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80'],
+  },
+];
+
+// ── Zara seller listings ────────────────────────────
+const zaraListings = (zaraId) => [
+  {
+    title: 'Emerald & Gold Necklace — Art Deco',
+    description: 'Art Deco necklace in 18k yellow gold set with 7 Colombian emeralds totalling 9.4ct and 142 diamonds totalling 3.1ct. Signed by Cartier Paris, circa 1925.',
+    category: 'Jewelry', startingBid: 55000, currentBid: 71000,
+    startDate: new Date('2026-02-01'), endDate: new Date('2026-10-31'),
+    status: 'live', totalBids: 16, createdBy: zaraId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80'],
+  },
+  {
+    title: 'Watercolour Series — "Serengeti Seasons"',
+    description: 'Set of four framed watercolours depicting the Serengeti across four seasons. Each 50x70cm, archival framing. Artist: Miriam Osei.',
+    category: 'Art', startingBid: 2000, currentBid: 3800,
+    startDate: new Date('2026-01-01'), endDate: new Date('2026-07-31'),
+    status: 'live', totalBids: 10, createdBy: zaraId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80'],
+  },
+  {
+    title: 'Sapphire & Diamond Tennis Bracelet',
+    description: 'Stunning 18k white gold tennis bracelet set with 28 oval Ceylon sapphires totalling 14ct alternating with 56 round brilliant diamonds totalling 4.2ct.',
+    category: 'Jewelry', startingBid: 22000, currentBid: 31500,
+    startDate: new Date('2026-02-15'), endDate: new Date('2026-08-15'),
+    status: 'live', totalBids: 9, createdBy: zaraId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80'],
+  },
+  {
+    title: 'Abstract Expressionist — "Fire & Ice"',
+    description: 'Large format mixed media on canvas 150x200cm. Kenya-based artist Wanjiru Kamau. Acquired directly from the artist\'s studio in Nairobi 2023.',
+    category: 'Art', startingBid: 4500, currentBid: 6200,
+    startDate: new Date('2025-10-01'), endDate: new Date('2025-12-31'),
+    status: 'ended', totalBids: 8, createdBy: zaraId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80'],
+  },
+  {
+    title: 'Ruby & Gold Cocktail Ring — 1950s',
+    description: 'Magnificent 1950s cocktail ring in 18k yellow gold. Centre Burmese ruby of 4.8ct surrounded by 32 old European cut diamonds. Accompanied by AGL certificate.',
+    category: 'Jewelry', startingBid: 18000, currentBid: 18000,
+    startDate: new Date('2026-05-01'), endDate: new Date('2026-11-01'),
+    status: 'upcoming', totalBids: 0, createdBy: zaraId,
+    listedBy: 'seller', approvalStatus: 'approved',
+    images: ['https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80'],
   },
 ];
 
@@ -213,52 +307,90 @@ const seed = async () => {
 
     // Create users
     const createdUsers = await User.create(users);
-    const admin  = createdUsers.find(u => u.role === 'admin');
-    const buyers = createdUsers.filter(u => u.role === 'buyer');
+    const admin   = createdUsers.find(u => u.role === 'admin');
+    const buyers  = createdUsers.filter(u => u.role === 'buyer');
+    const marcus  = createdUsers.find(u => u.email === 'marcus@test.com');
+    const zara    = createdUsers.find(u => u.email === 'zara@test.com');
     console.log(`Created ${createdUsers.length} users`);
 
-    // Create auctions
-    const auctions = await Auction.create(auctionTemplates(admin._id));
+    // Create all auctions
+    const allAuctionData = [
+      ...adminAuctionTemplates(admin._id),
+      ...marcusListings(marcus._id),
+      ...zaraListings(zara._id),
+    ];
+
+    const auctions = await Auction.create(allAuctionData);
     console.log(`Created ${auctions.length} auctions`);
 
-    // Create realistic bids for live/ended auctions
+    // Create realistic bids for live and ended auctions
     const bidDocs = [];
+
     for (const auction of auctions) {
       if (auction.totalBids === 0) continue;
 
+      const increment = Math.floor(
+        (auction.currentBid - auction.startingBid) / Math.max(auction.totalBids, 1)
+      );
+
       let amount = auction.startingBid;
-      const increment = Math.floor((auction.currentBid - auction.startingBid) / Math.max(auction.totalBids, 1));
 
       for (let i = 0; i < auction.totalBids; i++) {
         const bidder = buyers[i % buyers.length];
         amount += increment + Math.floor(Math.random() * 200);
+
         bidDocs.push({
-          auction: auction._id,
-          bidder:  bidder._id,
-          amount:  Math.min(amount, auction.currentBid),
-          status:  i === auction.totalBids - 1 ? 'active' : 'outbid',
+          auction:   auction._id,
+          bidder:    bidder._id,
+          amount:    Math.min(amount, auction.currentBid),
+          status:    i === auction.totalBids - 1 ? 'active' : 'outbid',
           createdAt: new Date(Date.now() - (auction.totalBids - i) * 3600000),
         });
       }
 
       // Set highest bidder
       const lastBidder = buyers[(auction.totalBids - 1) % buyers.length];
-      await Auction.findByIdAndUpdate(auction._id, { highestBidder: lastBidder._id });
+      await Auction.findByIdAndUpdate(auction._id, {
+        highestBidder: lastBidder._id,
+      });
     }
 
     await Bid.create(bidDocs);
     console.log(`Created ${bidDocs.length} bids`);
 
+    // Update seller stats
+    const marcusSales   = await Auction.find({ createdBy: marcus._id, status: 'ended' });
+    const zaraSales     = await Auction.find({ createdBy: zara._id,   status: 'ended' });
+    const marcusRevenue = marcusSales.reduce((sum, a) => sum + a.currentBid, 0);
+    const zaraRevenue   = zaraSales.reduce((sum,   a) => sum + a.currentBid, 0);
+
+    await User.findByIdAndUpdate(marcus._id, {
+      'sellerProfile.totalSales':   marcusSales.length,
+      'sellerProfile.totalRevenue': marcusRevenue,
+    });
+
+    await User.findByIdAndUpdate(zara._id, {
+      'sellerProfile.totalSales':   zaraSales.length,
+      'sellerProfile.totalRevenue': zaraRevenue,
+    });
+
     console.log('\n✅ Seed complete!\n');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('  Admin:   admin@oams.com / Admin@1234');
-    console.log('  Buyers:  james@test.com / 123456');
-    console.log('           amina@test.com / 123456');
-    console.log('           denis@test.com / 123456');
-    console.log('           sofia@test.com / 123456');
-    console.log('           luca@test.com  / 123456');
-    console.log('           yuki@test.com  / 123456');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('  Admin:    admin@oams.com   / Admin@1234');
+    console.log('  Sellers:  marcus@test.com  / 123456');
+    console.log('            zara@test.com    / 123456');
+    console.log('  Buyers:   james@test.com   / 123456');
+    console.log('            amina@test.com   / 123456');
+    console.log('            denis@test.com   / 123456');
+    console.log('            sofia@test.com   / 123456');
+    console.log('            luca@test.com    / 123456');
+    console.log('            yuki@test.com    / 123456');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`\n  Total auctions: ${auctions.length}`);
+    console.log(`  Admin listings: ${allAuctionData.filter(a => a.listedBy === 'admin').length}`);
+    console.log(`  Marcus listings: ${marcusListings(marcus._id).length}`);
+    console.log(`  Zara listings:   ${zaraListings(zara._id).length}`);
+    console.log(`  Total bids:      ${bidDocs.length}`);
 
     process.exit();
   } catch (err) {
